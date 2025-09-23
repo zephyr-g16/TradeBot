@@ -1,0 +1,63 @@
+A. Controller & Lifecycle
+- Controller is the permanent orchestrator; main.py delegates logic to Controller.
+- Trader defined as (symbol + strategy) instance with dedicated PositionManager.
+- Idempotent start/stop for traders with threading.Event for clean stop/start.
+- Registry guarded by lock; _strats is single source of truth.
+- Record last_tick_ms per trader for health checks; update on every tick.
+- Heartbeat thread (`run_forever`) manages stale checks and lifecycle.
+
+B. Control Plane & API
+- Redis command channel: `controller:commands`; optional replies channel `controller:replies`.
+- Command JSON schema: `cmd` ("start"|"stop"|"list"|"status"|"shutdown"), `symbol`, `strategy` (default "base"), `reply_to`.
+- Command handlers: `_cmd_start`, `_cmd_stop`, `_cmd_list`, `_cmd_status`, `_cmd_shutdown`.
+- Idempotent start/stop commands; list returns active symbols and alive flags; status returns trader status + tick freshness.
+- `run_control_loop()` listens on Redis pubsub for commands, dispatches handlers, publishes replies if requested.
+- FastAPI-based `run_api_gateway()` provides REST endpoints mapping to command handlers for external HTTP control.
+
+C. Multi-tenant / Ownership
+- Trader IDs namespaced by symbol+strategy+owner/tag for multi-tenancy.
+- Support multiple traders per symbol with unique IDs.
+- Owner-based access control: commands filtered by owner_id; admin override possible.
+- Planned real authentication with JWT; API enforces owner_id injection server-side.
+- Frontend adapted for login/logout flow; JWT attached to requests; no client-sent owner info.
+
+D. Strategies
+- Strategy registry maps names to strategy classes.
+- start_trader pulls strategy from registry; supports hot-reload and dynamic swapping.
+- PositionManager preserved across strategy swaps when possible.
+
+E. Health / Recovery
+- Track last tick per trader; detect stale (no ticks for N seconds).
+- Auto-restart traders with exponential backoff and caps.
+- Aggregate heartbeat snapshots per trader planned but on hold.
+
+F. Persistence
+- Persist fleet state to JSON/YAML on start/stop/swap.
+- Reload fleet state on controller startup to restore traders.
+
+G. UI & Frontend
+- Text-based console UI for interactive control.
+- Basic web frontend with trader list, start/stop controls, live price graphs.
+- OTP-based login prototype implemented; real auth planned.
+- Frontend communicates with API gateway; supports user sessions and ownership.
+
+H. Logging & Observability
+- Switch heartbeat/trade logs to structured JSON.
+- Store Redis counters per trader (ticks, orders).
+- Minimal metrics (ticks/sec, restarts).
+- Use unbuffered output for systemd compatibility.
+
+Manual Test Plan
+- Use Redis CLI to PUBLISH JSON commands to `controller:commands`.
+- Commands: start (with symbol and strategy), stop, list, status.
+- SUBSCRIBE to `controller:replies` to verify responses.
+- Verify idempotent start/stop and clean shutdown behavior.
+- Test API gateway endpoints via HTTP clients.
+
+Pitfalls & Notes
+- Ensure thread-safe registry updates with locks.
+- Validate numeric inputs and clamp risky parameters.
+- Avoid dict/NoneType errors in lifecycle and status handling.
+- OTP visible client-side; replace with JWT auth for production.
+- Keep CORS tight and rate-limit auth endpoints.
+- Plan migration tests for multi-tenant isolation and admin overrides.

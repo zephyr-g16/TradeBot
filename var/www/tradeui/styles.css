@@ -1,0 +1,58 @@
+body { font: 14px/1.4 system-ui; margin: 0; color: #f6f6f6; background: radial-gradient(1000px 600px at 80% -10%, rgba(59,131,246,.15), transparent 60%), radial-gradient(800px 500px at -10% 110%, rgba(16,185,129,.10), transparent 60%), #26252e; background-attachment: fixed; background-repeat: no-repeat;}
+#log { white-space: pre-wrap; background: #111; color: #e3e3e3; padding: 10px; border-radius: 6px; }
+#view-dashboard .grid {display: grid; align-items: start; grid-template-columns: auto 1fr; gap: 12px;}
+#view-settings .grid {display: grid; align-items: start; grid-template-columns: repeat(3, minmax(240px, 1fr)); gap: 12px;}
+#view-login {min-height: 100vh; display: grid; place-items: center;}
+.left-col {display: flex; flex-direction: column; gap: 12px; min-width: 0;}
+.login-wrap { width: 100%; max-width: 420px; padding: 24px;}
+.login-card {backdrop-filter: blur(10px); background: rgba(20,21,30,0.55); border: 1px solid #fff3d1a4; border-radius: 14px; padding: 22px; box-shadow: 0 12px 40px #111;}
+.brand {display: flex; align-items: center; gap: 12px; margin-bottom: 16px;}
+.brand-mark {width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; letter-spacing: 1px; background: #0f172a; border: 1px solid #1f2937;}
+.brand-text h1 {margin: 0; font-size: 1.25rem;}
+.tagline {margin: 2px 0 0; opacity: .75; font-size: .9rem;}
+#loginForm label {margin: 10px 0 4px; display: block;}
+#loginForm input {width: 100%; font-size: 1rem; padding: 10px 12px; border-radius: 8px; background: #2b2b35; border: 1px solid #3a3a46; color: #f6f6f6; outline: none; transition: border-color .15s, box-shadow .15s;}
+#loginForm input:focus {border-color: #3b83f6; box-shadow: 0 0 0 3px rgba(59,131,246,.15);}
+.input-row {display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center;}
+button.primary {width: 100%; margin-top: 14px; padding: 10px 12px; border-radius: 8px; background: #3b83f6; border: 1px solid #2a5ec0; color: #fff; font-weight: 700; transition: transform .06s, filter .15s, background .15s;}
+button.primary:hover {filter: brightness(1.05);}
+button.primary:active {transform: translateY(1px) scale(.99);}
+button.ghost {background: transparent; border: 1px solid #3a3a46; color: #cfcfd4; padding: 8px 10px; border-radius: 8px;}
+button.ghost:hover {background: #1f1f26;}
+.help {text-align: center; margin: 10px 0 0; opacity: .7; font-size: .85rem;}
+.err {color: #ff6b6b; margin-top: 8px; text-align: center;}
+label { display: block; margin: 8px 0 4px; }
+.dash-grid { display: grid; grid-template-columns: 220px 1fr; gap: 12px; align-items: start;}
+.trader-list {list-style: none; margin: 0; padding: 0;}
+.trader-list li {padding: 6px 8px; border-radius: 6px; cursor: pointer;}
+.trader-list li:hover {background: #1f1f26;}
+.trader-list li:active {background: #273050; border: 1px solid #3b83f6;}
+.dash-grid main.card {min-width: 0;}
+.page { max-width: 1080px; margin: 45px auto; padding: 60px 12px 12px;}
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.card {flex: 1; border: 1px solid #736783c2; padding: 12px; border-radius: 8px; margin: 10px 0; background-color: #14151e8d; max-width: 1080px; max-height: 720px; overflow: visible;}
+.grid {display: grid; grid-template-columns: auto 1fr; gap: 6px; }
+.ok{color: green;} .bad{color: crimson;}
+.hidden {display: none !important;}
+.appbar {position: fixed; top: 0; left: 0; right: 0; width: 100vw;box-sizing: border-box; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid #5353538d; top: 0; background: #14151e8d; z-index: 1000;}
+.owner-pill {padding: 4px 8px; border-radius: 999px; background: #14151e8d; font-size: 0.9rem;}
+.tabs { display: inline-flex; gap: 6px;}
+.tab {border: none; background: transparent; padding: 8px 12px; border-bottom: 2px solid transparent; cursor: pointer; font-weight: 600;}
+.tab.active {border-bottom-color: #3b83f6;}
+.link { border: none; background: transparent; color: #2563eb; cursor: pointer}
+.right { text-align: right;} 
+.left { text-align: left;}
+.watch-head {display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px;}
+.watch-title {font-size: 1.1rem; font-weight: 700;}
+.watch-sub {font-size: .9rem; opacity: .8;}
+.watch-metrics {display: inline-flex; gap: 6px; align-items: center; }
+.pill {padding: 4px 8px; border-radius: 999px; background: #1f2937; border: 1px solid #374151;}
+.watch-foot {display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; font-size: .9rem; opacity: .9;}
+.chart-wrap { height: clamp(260px, 45vh, 520px);}
+#watchchart {width: 100%; height: 100%; display: block;}
+input {color: #e3e3e3; background-color: #333; border: #111; padding: 6px; border-radius: 4px;}
+button {color: #e3e3e3; background-color: #111; border: #111; padding: 6px; border-radius: 4px; margin: 4px; transition: background-color 0.2s, transform 0.1s; cursor: pointer;}
+button:hover {background-color: #222;}
+button:active {transform: scale(0.96); background-color: #000;}
+select {color: #e3e3e3; background-color: #111; border: #111; padding: 4px; border-radius: 4px;}
+.card-row { display: flex; gap: 12px;}

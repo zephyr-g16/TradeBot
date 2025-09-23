@@ -1,0 +1,64 @@
+🚀 Alpha Test Rollout Roadmap
+
+Target: First tester group live by end of September
+
+⸻
+
+✅ Foundations (Done so far)
+	- [x] Multi-user traders (owner → traders).
+	- [x] Controller as orchestrator, persistent across restarts.
+	- [x] Redis command plane + API.
+	- [x] Web UI with login, dashboard, trader management, and graphs.
+	- [x] OTP auth (email-based, 60s expiration).
+
+⸻
+
+🎯 Must-Do Next (Done so far)
+	- [x] Authentication / Identity
+		- [x] OTP login stable.
+		- [x] Session persistence in local storage.
+		- [x] User isolation: no cross-trader visibility.
+		- [x] Logout function.
+	- [x] Trader Management
+		- [x] Start trader via dropdowns.
+		- [x] Stop trader from “My Traders” list.
+		- [x] Add new symbol support.
+		- [x] Live heartbeat/status feed.
+		- [x] Add a 'fake trader' to show users earning potential based on bot predictions.
+			- [x] Allows users to allocate funds and see earnings/losses.
+			- [x] Total sum amount type graphic.
+			- [x] Reset rules per login/session refresh.
+			- [x] Persistence of state in position_state.json and predictions.
+			- [x] Clearly labeled as simulation only.
+	- [x] UI
+		- [x] Login → dashboard flow.
+		- [ ] Tabs/sections: Dashboard | Settings.
+		- [x] Graph per trader (live price line).
+		- [x] Auto-populated “My Traders” list.
+	- [ ] Safety / Stability
+		- [x] Controller saves state on shutdown.
+		- [x] No duplicate predictions on restart.
+		- [x] Per-user trade logs.
+		- [ ] Clear UI error messages (removed previously).
+
+⸻
+
+🧩 Nice-to-Have (Done so far)
+	- [ ] Trade execution notifications (email).
+	- [ ] Configurable refresh rates.
+	- [x] Default dropdown symbols.
+	- [ ] Basic performance stats (win/loss, PnL).
+	- [ ] Responsive UI polish.
+
+⸻
+
+📅 Rollout Plan (Done so far)
+	- [x] Package controller + API as systemd services.
+	- [x] Host web UI via Tailscale (for testers only).
+	- [x] Seed 2-3 users for first trial.
+	- [x] Monitor resource load + trade logs.
+	- [ ] Collect UX feedback and iterate quickly.
+
+⸻
+
+End goal: by Sept 30, first testers using the app end-to-end.
