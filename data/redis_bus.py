@@ -24,6 +24,6 @@ def subscribe(r: redis.Redis, channel: str, on_message: Callable[[dict], None], 
     ps = r.pubsub()
     ps.subscribe(channel)
     while True:
-        msg = ps.get_message(timeout=timeout)
+        msg = ps.get_message(ignore_subscribe_messages=True, timeout=timeout)
         if msg and msg.get("type") == "message":
             on_message(json.loads(msg["data"]))

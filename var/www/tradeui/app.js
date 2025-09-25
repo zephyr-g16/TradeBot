@@ -134,7 +134,7 @@ function showView(name) {
 	$("tabbar").classList.toggle("hidden", inLogin);
 	$("view-dashboard").classList.toggle(
 		"hidden",
-		!inDash || name === "settings",
+		!inDash || name === "settings" || inLogin,
 	);
 	$("view-settings").classList.toggle("hidden", name !== "settings");
 
@@ -390,7 +390,7 @@ async function start() {
 	if (!owner) return alert("Set Username First");
 	const symbol = $("symbolSelect").value.trim();
 	const strategy = $("strategySelect").value.trim() || "base";
-	const fund_amnt = $("fundAmnt").value.trim() || "100";
+	const fund_amnt = $("fundAmnt").value.trim() || "None";
 	if (!symbol) return alert("No symbol selected");
 	try {
 		const data = await api("/traders/start", {

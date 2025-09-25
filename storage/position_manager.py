@@ -105,7 +105,6 @@ class Position_manager:
             self.positions["sell_limit_set"] = False
             self.positions["sell_price"] = None
             self.positions["buy_limit_set"] = False
-            self.positions["buy_limit"] = None
             self.positions["buy_prediction_timestamp"] = None
             self.save_to_file()
 

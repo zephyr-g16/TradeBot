@@ -30,7 +30,7 @@ def on_message(strat: TradingStrategy, message):
         print(f"Place sell order for {symbol} at ${strat.sell_price}")
         pm.set_sell_limit(strat.sell_price)
         log_trade(symbol, strat.sell_price, "sell_prediction", strat.owner)
-        strat.save_positio()
+        strat.save_position()
     
     if pm.has_buy_limit():
         if strat.should_buy(price) and not pm.is_position_open():

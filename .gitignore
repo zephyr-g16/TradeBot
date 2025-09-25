@@ -1,0 +1,31 @@
+# Ignore Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Ignore compiled extensions
+*.so
+
+# Ignore virtualenvs
+.venv/
+env/
+venv/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore trade data & logs
+trade_data/
+*.log
+data/active_traders.json
+
+# Ignore editor/project files
+.vscode/
+.idea/
+
+# Ignore build/test artifacts
+*.egg-info/
+dist/
+build/

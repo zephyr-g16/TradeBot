@@ -1,7 +1,8 @@
 from fastapi import FastAPI, HTTPException, APIRouter, BackgroundTasks, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
+from typing import Optional
 from data.redis_bus import get_client, publish_json
 from utils.notifier import Notifier
 import uuid
@@ -46,8 +47,14 @@ class StartReq(BaseModel):
     owner: str
     symbol: str
     strategy: str = "base"
-    fund_amnt: float
+    fund_amnt: Optional[float] = None
 
+    @field_validator("fund_amnt", mode="before")
+    def parse_funds(cls, v):
+        if v is None or v == "None" or v == "":
+            return None
+        else:
+            return v
 
 class ListReq(BaseModel):
     owner: str

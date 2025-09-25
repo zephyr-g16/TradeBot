@@ -1,137 +1,145 @@
 <!doctype html>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <title>TradeBot</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <link rel="stylesheet" href="styles.css" />
-        <script src="https://cdn.jsDelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1"></script>
-    </head>
-    <body>
-        <div id="tabbar">
-            <header class="appbar">
-                <div class="left">
-                    <span id="ownerBadge" class="owner-pill"></span>
-                </div>
-                <nav class="tabs">
-                    <button id="tab-dashboard" class="tab">Dashboard</button>
-                    <button id="tab-settings" class="tab">Settings</button>
-                </nav>
-                <div class="right">
-                    <button id="btnLogout">Log out</button>
-                </div>
-            </header>
-        </div>
-        <!-- View: Login-->
-        <div class="page">
-            <section id="view-login">
-                <div class="login-wrap">
-                    <div class="login-card">
-                        <div class="brand">
-                            <div class="brand-mark">Z8</div>
-                            <div class="brand-text">
-                                <h1>Z8 • Harbinger</h1>
-                                <p class="tagline">automated crypto trading, made simple</p>
-                            </div>
-                        </div>
-                        <form id="loginForm">
-                            <label for="owner">Email</label>
-                            <input id="owner" autocomplete="email" style="max-width: 350px;"/>
-                            <label for="otpCode" class="hidden">One-Time Code</label>
-                            <input id="otpCode" type="text" inputmode="numeric" class="hidden" style="max-width: 350px;"/>
-                            <button id="btnSendCode" type="button" class="primary">Send Code</button>
-                            <button id="btnLogin" type="submit" class="primary hidden">Log in</button>
-                            <p id="loginHelp" class="help">alpha build</p>
-                            <p id="loginErr" class="err hidden">Login failed - try again.</p>
-                        </form>
-                    </div>
-                </div>
-            </section>
-            <!-- View: Dashboard -->
-            <section id="view-dashboard" class="hidden">
-                <div class="dash-grid">
-                    <div class="left-col">
-                        <aside class="nav-card card">
-                            <h3 style="text-align: center;">My Traders</h3>
-                            <ul id="traderNav" class="trader-list"></ul>
-                        </aside>
-                        <aside id="tradeCard" class="card">
-                            <h3 style="margin: 0 0;">Sim Trader</h3>
-                            <div class="row" style="gap: 12px; align-items: flex-end;">
-                                <div class="col">
-                                    <div class="meta" style="display: flex; flex-direction: column; gap: 4px;">
-                                        Balance: <span id="watchBalance">-</span>
-                                        Quantity: <span id="watchQty">-</span>
-                                        <button id="btnNewTrader">New Trader</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </aside>
-                    </div>
-                    <main class="card">
-                        <div class="watch-head">
-                            <div>
-                                <div id="watchSymbolLabel" class="watch-title">-</div>
-                                <div id="watchStage" class="watch-sub" style="color: green;">-</div>
-                            </div>
-                            <div class="watch-metrics">
-                                <div>
-                                    <span>Live Price: </span>
-                                    <div class="pill">$
-                                        <span id="watchPrice">-</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="chart-wrap">
-                            <canvas id="watchChart"></canvas>
-                        </div>
-                        <div class="watch-foot">
-                            <div>entry limit: $<span id="watchEntry">-</span></div>
-                            <div>sell limit: $<span id="watchSell">-</span></div>
-                            <div style="justify-content: right;">
-                                <button id="btnStop">Stop</button>
-                            </div>
-                        </div>
-                    </main>
-                </div>
-            </section>
-            <section id="view-settings" class="hidden">
-                <div class="card">
-                    <h3>New Symbol</h3>
-                    <div class="row">
-                        <input id="newSymbol" placeholder="e.g. XRP/USD" />
-                        <button id="btnAddSymbol">Add</button>
-                    </div>
-                    <small id="addSymbolMsg"></small>
-                </div>
-            </section>
-            <section id="NewTrader" class="hidden">
-                <div class="grid" style="justify-content: center;">
-                    <div class="card">
-                        <h3 style="text-align: center;">Start Trader</h3>
-                        <div class="grid" style="justify-content: center;">
-                            <select id="symbolSelect"></select>
-                            <select id="strategySelect">
-                                <option value="base">base</option>
-                            </select>
-                            <label for="fundAmnt" style="font-weight: 500;">Budget</label>
-                            <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 12px;">
-                                <span>$</span>
-                                <input id="fundAmnt" type="number" min="0" placeholder="100.00" style="background-color: transparent; color: #fff; border: 1px solid #686868; max-width: 100px;"/>
-                            </div>
-                            <button id="btnStart">Start</button>
-                            <button id="btnBack" type="button">Back</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <div id="Log" class="hidden">
-                <h3>Log</h3>
-                <div id="log"></div>
-            </div>
-        </div>
-        <script src="app.js"></script>
-    </body>
+
+<head>
+	<meta charset="utf-8" />
+	<title>TradeBot</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="stylesheet" href="styles.css" />
+	<script src="https://cdn.jsDelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1"></script>
+</head>
+
+<body>
+	<div id="tabbar">
+		<header class="appbar">
+			<div class="left">
+				<span id="ownerBadge" class="owner-pill"></span>
+			</div>
+			<nav class="tabs">
+				<button id="tab-dashboard" class="tab">Dashboard</button>
+				<button id="tab-settings" class="tab">Settings</button>
+			</nav>
+			<div class="right"></div>
+		</header>
+	</div>
+	<!-- View: Login-->
+	<div class="page">
+		<section id="view-login">
+			<div class="login-wrap">
+				<div class="login-card">
+					<div class="brand">
+						<div class="brand-mark">Z8</div>
+						<div class="brand-text">
+							<h1>Z8 • Harbinger</h1>
+							<p class="tagline">automated crypto trading, made simple</p>
+						</div>
+					</div>
+					<form id="loginForm">
+						<label for="owner">Email</label>
+						<input id="owner" autocomplete="email" style="max-width: 350px;" />
+						<label for="otpCode" class="hidden">One-Time Code</label>
+						<input id="otpCode" type="text" inputmode="numeric" class="hidden"
+							style="max-width: 350px;" />
+						<button id="btnSendCode" type="button" class="primary">Send
+							Code</button>
+						<button id="btnLogin" type="submit" class="primary hidden">Log
+							in</button>
+						<p id="loginHelp" class="help">alpha build</p>
+						<p id="loginErr" class="err hidden">Login failed - try again.</p>
+					</form>
+				</div>
+			</div>
+		</section>
+		<!-- View: Dashboard -->
+		<section id="view-dashboard">
+			<div class="dash-grid">
+				<div class="left-col">
+					<aside class="nav-card card">
+						<h3 style="text-align: center;">My Traders</h3>
+						<ul id="traderNav" class="trader-list"></ul>
+					</aside>
+					<aside id="tradeCard" class="card">
+						<h3 style="margin: 0 0;">Sim Trader</h3>
+						<div class="row" style="gap: 12px; align-items: flex-end;">
+							<div class="col">
+								<div class="meta"
+									style="display: flex; flex-direction: column; gap: 4px;">
+									Balance: <span id="watchBalance">-</span>
+									Quantity: <span id="watchQty">-</span>
+									<button id="btnNewTrader">New Trader</button>
+								</div>
+							</div>
+						</div>
+					</aside>
+				</div>
+				<main class="card">
+					<div class="watch-head">
+						<div>
+							<div id="watchSymbolLabel" class="watch-title">-</div>
+							<div id="watchStage" class="watch-sub" style="color: green;">-
+							</div>
+						</div>
+						<div class="watch-metrics">
+							<div>
+								<span>Live Price: </span>
+								<div class="pill">$
+									<span id="watchPrice">-</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="chart-wrap">
+						<canvas id="watchChart"></canvas>
+					</div>
+					<div class="watch-foot">
+						<div>entry limit: $<span id="watchEntry">-</span></div>
+						<div>sell limit: $<span id="watchSell">-</span></div>
+						<div style="justify-content: right;">
+							<button id="btnStop">Stop</button>
+						</div>
+					</div>
+				</main>
+			</div>
+		</section>
+		<section id="view-settings" class="hidden"
+			style="display: flex; align-items: center; justify-content: center;">
+			<div class="card"
+				style="display: grid; grid-template-columns: 3fr; max-width: 360px; max-height: 980px; justify-content: center;">
+				<button id="btnAccount" style="max-height: 60px;">Account</button>
+				<button id="btnPreferences" style="max-height:60px;">Preferences</button>
+				<button id="btnFaq" style="max-height: 60px;">FAQ</button>
+				<button id="btnLogout">Log out</button>
+			</div>
+		</section>
+		<section id="NewTrader" class="hidden">
+			<div class="grid" style="justify-content: center;">
+				<div class="card">
+					<h3 style="text-align: center;">Start Trader</h3>
+					<div class="grid" style="justify-content: center;">
+						<select id="symbolSelect"></select>
+						<select id="strategySelect">
+							<option value="base">base</option>
+						</select>
+						<label for="fundAmnt" style="font-weight: 500;">Budget</label>
+						<div
+							style="display: flex; align-items: center; gap: 4px; margin-bottom: 12px;">
+							<span>$</span>
+							<input id="fundAmnt" type="number" min="0" placeholder="0.00"
+								style="background-color: transparent; color: #fff; border: 1px solid #686868; max-width: 100px;" />
+						</div>
+						<button id="btnStart">Start</button>
+						<button id="btnBack" type="button">Back</button>
+					</div>
+				</div>
+			</div>
+		</section>
+		<div id="Log" class="hidden">
+			<h3>Log</h3>
+			<div id="log"></div>
+		</div>
+	</div>
+	<script src="app.js"></script>
+</body>
+
 </html>

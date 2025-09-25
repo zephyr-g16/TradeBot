@@ -1,13 +1,9 @@
-# from data.kraken_feed import KrakenPriceFeed
-from data.redis_bus import get_json, get_client, subscribe, tick_channel, publish_json, hb_channel
+from data.redis_bus import get_json, get_client, subscribe, tick_channel, hb_channel
+from strategies.base_strategy import TradingStrategy
 from controllers.trade_controller import on_message
-from storage.position_manager import Position_manager as pm
-from strategies.base_strategy import TradingStrategy, TraderStatus
-from storage.trade_logger import log_trade as logger
 from utils.utility import Utility
 import threading
 import time
-import argparse
 import json
 from dataclasses import asdict
 import os
@@ -25,7 +21,7 @@ class Controller:
         self._strats: dict[str, TradingStrategy] = {}
         self.last_hb = 0
         self.controller_stop = threading.Event()
-        self.last_tick_ms: dict[str, int] = {}
+        self.last_tick: dict[str, float] = {}
 
     def get_or_create_strat(self, symbol: str, owner, fund_amnt: float) -> TradingStrategy:
         high_24h, low_24h = Utility().get_24h_high_low(symbol)
@@ -39,7 +35,7 @@ class Controller:
                 self._strats[tid] = strat
             return strat
     
-    def start_trader(self,owner, symbol: str, strategy_name: str, fund_amnt: float) -> bool:
+    def start_trader(self,owner, symbol: str, strategy_name: str, fund_amnt) -> bool:
         tid = f"{symbol}|{owner}"
         with self._cache_lock:
             t = self.threads.get(tid)
@@ -102,14 +98,14 @@ class Controller:
                     with self._cache_lock:
                         self.threads.pop(thread, None)
                         self.stop_flags.pop(thread, None)
-                        self.last_tick_ms.pop(thread, None)
+                        self.last_tick.pop(thread, None)
                         self._strats.pop(thread, None)
         return {"ok": True, "stopped": stopped, "still_running": still}
 
 
     def run_strategy(self, symbol, owner, stop_evt, fund_amnt):
         tid = f"{symbol}|{owner}"
-        self.last_tick_ms[tid] = time.time()
+        self.last_tick[tid] = time.time()
         wkr_client = get_client()
         ps = wkr_client.pubsub()
         ps.subscribe(tick_channel(symbol))
@@ -120,25 +116,27 @@ class Controller:
                 if msg.get("symbol") != symbol:
                     return
                 price = float(msg["price"])
-                self.last_tick_ms[tid] = time.time()
+                self.last_tick[tid] = time.time()
                 on_message(strategy, price)
 
-            print(f"[INFO] Strategy started for {symbol}")
+
+            print(f"[INFO] Strategy started for {tid}")
+
             while not stop_evt.is_set():
                 now = time.time()
-                if now - self.last_tick_ms[tid] < 30:
+                if now - self.last_tick[tid] < 30:
                     msg = ps.get_message(timeout=5)
                     if not msg or msg.get("type") != "message":
                         continue
                     on_tick(json.loads(msg['data']))
-                elif now - self.last_tick_ms[tid] > 30:
+                elif now - self.last_tick[tid] > 30:
                     try:
                         ps.close()
                     except Exception:
                         pass
                     ps = wkr_client.pubsub()
                     ps.subscribe(tick_channel(symbol))
-                    self.last_tick_ms[tid] = time.time()
+                    self.last_tick[tid] = time.time()
             strategy.save_position()
             ps.unsubscribe(tick_channel(symbol))
             ps.close()
@@ -154,7 +152,7 @@ class Controller:
     #         if now >= next_hb:
     #             with self._cache_lock:
     #                 items = list(self._strats.items())
-    #                 last_copy = dict(self.last_tick_ms)
+    #                 last_copy = dict(self.last_tick)
                 
     #             statuses = []
     #             for symbol, strat in items:
@@ -162,7 +160,7 @@ class Controller:
     #                 d = asdict(status)
     #                 last = last_copy.get(symbol)
     #                 age = (now - last) if last is not None else None
-    #                 d["last_tick_ms"] = last
+    #                 d["last_tick"] = last
     #                 d["tick_age_ms"] = age
     #                 d["stale"] = (age is not None and age >= timeout)
     #                 key = f"status:{symbol}"
@@ -180,7 +178,7 @@ class Controller:
     #         with self._cache_lock: #staleness check
     #             symbols = list(self.threads.keys())
     #         for symbol in symbols:
-    #             last = self.last_tick_ms.get(symbol)
+    #             last = self.last_tick.get(symbol)
     #             if last is not None and (now - last) >= timeout:
     #                 print(f"[INFO] Trader for {symbol} has gone stale")
     #         time.sleep(1)
@@ -221,10 +219,10 @@ class Controller:
             if not strat:
                 return {"ok": False, "error": "not running"}
             d = asdict(strat.status())
-            last = self.last_tick_ms.get(tid)
+            last = self.last_tick.get(tid)
             now = time.time()
             age = (now - last) if last is not None else None
-            d["last_tick_ms"] = last
+            d["last_tick"] = last
             d["tick_age"] = age
             d["stale"] = (age is not None and age >= 60)
             return {"ok": True, "status": d}
@@ -301,6 +299,18 @@ class Controller:
         except FileNotFoundError:
             print(f"{active_traders} not found...")
 
+    def active_update(self, tid):
+        active_traders = os.path.join('data/active_traders.json')
+        try:
+            with open(active_traders, 'r') as f:
+                active_list = json.load(f)
+            active_list.append(tid)
+            json.dump(active_list, f, indent=2)
+        except FileNotFoundError:
+            print("No active trader file found")
+
+
+
     def startup(self):
         trader_load_file = os.path.join("data/active_traders.json")
         try:
@@ -309,7 +319,7 @@ class Controller:
             for symown in traders:
                 symbol , owner = symown.split("|", 1)
                 strategy = "base"
-                self.start_trader(owner, symbol, strategy, fund_amnt=100)
+                self.start_trader(owner, symbol, strategy, fund_amnt=None)
         except FileNotFoundError:
             print(f"File: {trader_load_file} not found...")
 
